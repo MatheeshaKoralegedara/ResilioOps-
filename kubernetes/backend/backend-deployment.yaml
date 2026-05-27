@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: resilioops-backend:1.0
+          image: resilioops-backend:1.1
 
           ports:
             - containerPort: 5000
