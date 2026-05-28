@@ -1,52 +1,67 @@
 from flask import Flask, jsonify
-import os
 import psycopg2
 import redis
+import os
 
 app = Flask(__name__)
 
 # PostgreSQL connection
-def get_db():
-    return psycopg2.connect(
-        host=os.getenv("DB_HOST"),
-        database=os.getenv("POSTGRES_DB"),
-        user=os.getenv("POSTGRES_USER"),
-        password=os.getenv("POSTGRES_PASSWORD")
-    )
+db_conn = psycopg2.connect(
+    host=os.getenv("DB_HOST", "postgres"),
+    database=os.getenv("POSTGRES_DB"),
+    user=os.getenv("POSTGRES_USER"),
+    password=os.getenv("POSTGRES_PASSWORD")
+)
 
 # Redis connection
-cache = redis.Redis(
-    host=os.getenv("REDIS_HOST"),
+redis_client = redis.Redis(
+    host=os.getenv("REDIS_HOST", "redis"),
     port=6379,
     decode_responses=True
 )
 
 @app.route("/")
 def home():
+
+    # Redis cache check
+    cached = redis_client.get("homepage")
+
+    if cached:
+        return jsonify({
+            "source": "redis-cache",
+            "message": cached
+        })
+
+    # PostgreSQL query
+    cur = db_conn.cursor()
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS visitors (
+            id SERIAL PRIMARY KEY,
+            message TEXT
+        )
+    """)
+
+    cur.execute("""
+        INSERT INTO visitors (message)
+        VALUES ('ResilioOps Visitor Connected')
+    """)
+
+    db_conn.commit()
+
+    cur.execute("SELECT COUNT(*) FROM visitors")
+    count = cur.fetchone()[0]
+
+    message = f"Visitor count: {count}"
+
+    # Save to Redis
+    redis_client.set("homepage", message)
+
+    cur.close()
+
     return jsonify({
-        "message": "ResilioOps Backend Connected",
-        "status": "running"
-    })
-
-@app.route("/db-test")
-def db_test():
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("SELECT version();")
-    version = cur.fetchone()
-    conn.close()
-
-    return jsonify({
-        "postgres_version": version[0]
-    })
-
-@app.route("/cache-test")
-def cache_test():
-    cache.set("devops", "resilioops-running")
-    value = cache.get("devops")
-
-    return jsonify({
-        "redis_value": value
+        "source": "postgresql",
+        "message": message
     })
 
 if __name__ == "__main__":
