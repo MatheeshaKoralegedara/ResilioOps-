@@ -27,13 +27,13 @@ spec:
 
           env:
             - name: POSTGRES_USER
-              value: admin
+              value: postgres
 
             - name: POSTGRES_PASSWORD
-              value: admin123
+              value: mk1234
 
             - name: POSTGRES_DB
-              value: resilioops
+              value: resilioops_db
 
           volumeMounts:
             - name: postgres-data

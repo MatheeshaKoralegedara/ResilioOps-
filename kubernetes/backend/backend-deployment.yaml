@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: resilioops-backend:2.0
+          image: matheesha7/resilioops-backend:2.0
 
           ports:
             - containerPort: 5000
@@ -30,4 +30,20 @@ spec:
               value: postgres
 
             - name: REDIS_HOST
-              value: redis
+              value: 
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
