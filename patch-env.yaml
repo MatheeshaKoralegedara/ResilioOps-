@@ -1,0 +1,16 @@
+spec:
+  template:
+    spec:
+      containers:
+        - name: backend
+          env:
+            - name: DB_HOST
+              value: postgres
+            - name: POSTGRES_DB
+              value: resilioops
+            - name: POSTGRES_USER
+              value: admin
+            - name: POSTGRES_PASSWORD
+              value: admin123
+            - name: REDIS_HOST
+              value: redis

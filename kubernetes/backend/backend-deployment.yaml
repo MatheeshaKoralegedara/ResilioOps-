@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: backend
+  namespace: resilioops
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: backend
+
+  template:
+    metadata:
+      labels:
+        app: backend
+
+    spec:
+      containers:
+        - name: backend
+          image: matheesha7/resilioops-backend:2.0
+
+          ports:
+            - containerPort: 5000
+
+          env:
+            - name: DB_HOST
+              value: postgres
+
+            - name: REDIS_HOST
+              value: 
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
