@@ -1,0 +1,52 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+
+metadata:
+  name: backend-alerts
+  namespace: monitoring
+
+spec:
+  groups:
+
+    - name: backend.rules
+
+      rules:
+
+        - alert: BackendDown
+
+          expr: up{job=~".*backend.*"} == 0
+
+          for: 1m
+
+          labels:
+            severity: critical
+
+          annotations:
+            summary: Backend is down
+            description: Backend has been unavailable for 1 minute.
+
+        - alert: HighCPUUsage
+
+          expr: rate(container_cpu_usage_seconds_total{namespace="resilioops"}[5m]) > 0.5
+
+          for: 2m
+
+          labels:
+            severity: warning
+
+          annotations:
+            summary: High CPU usage
+            description: CPU usage above threshold.
+
+        - alert: HighMemoryUsage
+
+          expr: container_memory_working_set_bytes{namespace="resilioops"} > 200000000
+
+          for: 2m
+
+          labels:
+            severity: warning
+
+          annotations:
+            summary: High memory usage
+            description: Memory usage exceeded 200MB.
