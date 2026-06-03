@@ -4,6 +4,8 @@ kind: Service
 metadata:
   name: backend
   namespace: resilioops
+  labels:
+    app: backend
 
 spec:
   type: NodePort

@@ -7,10 +7,10 @@ spec:
             - name: DB_HOST
               value: postgres
             - name: POSTGRES_DB
-              value: resilioops
+              value: resilioops_db
             - name: POSTGRES_USER
-              value: admin
+              value: postgres
             - name: POSTGRES_PASSWORD
-              value: admin123
+              value: mk1234
             - name: REDIS_HOST
               value: redis

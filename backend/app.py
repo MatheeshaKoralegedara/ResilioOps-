@@ -1,10 +1,12 @@
 from flask import Flask, jsonify
+from prometheus_flask_exporter import PrometheusMetrics
 import psycopg2
 import redis
 import os
 
 app = Flask(__name__)
 
+metrics = PrometheusMetrics(app)
 # PostgreSQL connection
 db_conn = psycopg2.connect(
     host=os.getenv("DB_HOST", "postgres"),
